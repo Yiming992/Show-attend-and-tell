@@ -67,8 +67,27 @@ class DecoderRNN(nn.Module):
     
     def sample(self,features):
         word_index=[0]
-        context=
-        while start!=1 and len(word_index)
+        Alpha=[]
+        hc=self._init_hidden(features)
+        vocab=np.arange(self.vocab_size).astype(np.float32)
+        start=0
+        while start!=1 and len(word_index)<20:
+            start=torch.tensor(start).cuda()
+            start=torch.unsqueeze(start,0)
+            inputs=torch.unsqueeze(inputs,0)
+            context,alpha=self.attention(features,hc)
+            score,hc=self.forward(context,inputs,hc)
+            Alpha.append(alpha.cpu().data.numpy())
+            prob=F.softmax(outputs,dim=-1).squeeze()
+            topk=torch.topk(prob,3)
+            idxs,prob=topks[1].cpu().data.numpy(),topks[0].cpu().data.numpy()
+            start=np.random.choice(vocab[idxs],p=prob/prob.sum())
+            word_index.append(start)
+        return word_index,Alpha
+
+
+
+
         
 
 
